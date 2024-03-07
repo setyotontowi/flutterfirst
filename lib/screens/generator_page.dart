@@ -19,38 +19,37 @@ class GeneratorPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Randoms"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(pair: appState.current),
-            SizedBox(
-              height: 10.0,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              BigCard(pair: appState.current),
+              SizedBox(
+                height: 10.0,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        appState.toggleFavorites();
+                      },
+                      icon: Icon(icon),
+                      label: Text('Like')),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  ElevatedButton(
                     onPressed: () {
-                      appState.toggleFavorites();
+                      appState.next();
                     },
-                    icon: Icon(icon),
-                    label: Text('Like')),
-                SizedBox(
-                  width: 10.0,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    appState.next();
-                  },
-                  child: Text('Next'),
-                ),
-              ],
-            )
-          ],
+                    child: Text('Next'),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
