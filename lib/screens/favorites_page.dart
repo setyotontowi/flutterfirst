@@ -8,6 +8,7 @@ class FavoritePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+    appState.getFavorites();
 
     if (appState.favorites.isEmpty) {
       return Center(
@@ -24,7 +25,7 @@ class FavoritePage extends StatelessWidget {
         for (var pair in appState.favorites)
           ListTile(
             leading: Icon(Icons.favorite),
-            title: Text(pair.asPascalCase),
+            title: Text(pair),
           ),
       ],
     );
