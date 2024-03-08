@@ -1,6 +1,7 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velmo/screens/favorites_page.dart';
 import 'package:velmo/screens/generator_page.dart';
 
@@ -27,13 +28,13 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
+  var current = WordPair.random().asPascalCase;
   void next() {
-    current = WordPair.random();
+    current = WordPair.random().asPascalCase;
     notifyListeners();
   }
 
-  var favorites = <WordPair>[];
+  var favorites = <String>[];
   void toggleFavorites() {
     if (favorites.contains(current)) {
       favorites.remove(current);
@@ -41,6 +42,21 @@ class MyAppState extends ChangeNotifier {
       favorites.add(current);
     }
 
+    _saveFavorites();
+    notifyListeners();
+  }
+
+  var prefFavorites = "PREF_FAVORITES";
+
+  void _saveFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> list = favorites.map((word) => word.toString()).cast<String>().toList();
+    await prefs.setStringList(prefFavorites, list);
+  }
+
+  void getFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    favorites = prefs.getStringList("PREF_FAVORITES") ?? [];
     notifyListeners();
   }
 }
