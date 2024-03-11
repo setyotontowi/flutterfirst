@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velmo/screens/favorites_page.dart';
 import 'package:velmo/screens/generator_page.dart';
+import 'package:velmo/theme/themes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
           title: "Velmo Trials",
           theme: ThemeData(
             useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+            colorScheme: AppTheme.lightScheme,
           ),
           home: HomePage(),
         ));
