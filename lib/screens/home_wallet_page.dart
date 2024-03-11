@@ -1,11 +1,33 @@
 import 'package:flutter/material.dart';
 
-class HomeWalletPage extends StatelessWidget {
+class HomeWalletPage extends StatefulWidget {
   const HomeWalletPage({super.key});
+
+  @override
+  State<HomeWalletPage> createState() => _HomeWalletPageState();
+}
+
+class _HomeWalletPageState extends State<HomeWalletPage> {
+  double _opacity = 1.0;
+  late final ScrollController _scrollController;
+  ScrollNotification? _lastNotification;
+
+  @override
+  void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      double scrollFraction = _scrollController.offset / 80.0;
+      setState(() {
+        _opacity = 1.0 - scrollFraction.clamp(0.0, 1.0);
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      controller: _scrollController,
       slivers: <Widget>[
         SliverAppBar(
           pinned: true,
@@ -19,6 +41,7 @@ class HomeWalletPage extends StatelessWidget {
             title: WalletAppBar(
               title: "Wallet",
               subtitle: "You have 3 active wallets",
+              opacity: _opacity,
               button: IconButton(
                 icon: Icon(Icons.add),
                 onPressed: null,
@@ -45,21 +68,28 @@ class HomeWalletPage extends StatelessWidget {
   }
 }
 
-class WalletAppBar extends StatelessWidget implements PreferredSizeWidget {
+class WalletAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final String subtitle;
   final Widget button;
+  final double opacity;
 
   const WalletAppBar({
     Key? key,
     required this.title,
     required this.subtitle,
     required this.button,
+    required this.opacity,
   }) : super(key: key);
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
+  @override
+  State<WalletAppBar> createState() => _WalletAppBarState();
+}
+
+class _WalletAppBarState extends State<WalletAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -72,11 +102,14 @@ class WalletAppBar extends StatelessWidget implements PreferredSizeWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(title, style: TextStyle(fontSize: 18.0)),
-                Text(subtitle, style: TextStyle(fontSize: 14.0, color: Colors.grey))
+                Text(widget.title, style: TextStyle(fontSize: 18.0)),
+                Opacity(
+                    opacity: widget.opacity,
+                    child:
+                        Text(widget.subtitle, style: TextStyle(fontSize: 14.0, color: Colors.grey)))
               ],
             ),
-            button,
+            widget.button,
           ],
         ),
         Container(
