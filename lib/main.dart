@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velmo/screens/favorites_page.dart';
 import 'package:velmo/screens/generator_page.dart';
+import 'package:velmo/screens/home_wallet_page.dart';
 import 'package:velmo/theme/themes.dart';
 
 void main() {
@@ -94,7 +95,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> content = [GeneratorPage(), FavoritePage()];
+    List<Widget> content = [HomeWalletPage(), FavoritePage()];
 
     return Scaffold(
       body: SizedBox.expand(
