@@ -21,9 +21,13 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: "Velmo Trials",
           theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: AppTheme.lightScheme,
-          ),
+              useMaterial3: false,
+              colorScheme: AppTheme.lightScheme,
+              primaryColor: Colors.white,
+              appBarTheme: AppBarTheme(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  foregroundColor: Colors.transparent)),
           home: HomePage(),
         ));
   }

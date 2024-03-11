@@ -10,7 +10,8 @@ abstract class AppTheme {
       colorScheme: colorScheme,
       useMaterial3: true,
     ).copyWith(
-        appBarTheme: AppBarTheme(backgroundColor: Colors.white),
+        appBarTheme:
+            AppBarTheme(backgroundColor: Colors.transparent, foregroundColor: Colors.transparent),
         cardTheme: CardTheme(
             color: Colors.white,
             shape: RoundedRectangleBorder(
