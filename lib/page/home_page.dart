@@ -17,15 +17,31 @@ class HomePage extends StatelessWidget {
               padding: EdgeInsets.all(20),
               itemCount: state.length,
               itemBuilder: (context, index) {
+                String urlImage = state[index].urlToImage ?? "";
                 return Center(
-                  child: Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Image.network(state[index].avatar),
+                      Builder(builder: (context) {
+                        if (!urlImage.contains("http"))
+                          return SizedBox();
+                        else {
+                          return Container(
+                            child: Image.network(
+                              urlImage,
+                              fit: BoxFit.fitWidth,
+                              scale: 5.0,
+                            ),
+                          );
+                        }
+                      }),
                       Text(
-                        state[index].firstName,
+                        state[index].title ?? "",
                         style: TextStyle(fontSize: 10.0),
                       ),
+                      SizedBox(
+                        height: 20.0,
+                      )
                     ],
                   ),
                 );
