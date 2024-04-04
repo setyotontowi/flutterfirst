@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:velmo/bloc/news_cubit.dart';
 import 'package:velmo/page/404.dart';
+import 'package:velmo/page/home_page.dart';
 
 class MyRoutes {
   final NewsCubit newsCubit = NewsCubit();
@@ -12,7 +13,7 @@ class MyRoutes {
         return MaterialPageRoute(
             builder: (context) => BlocProvider.value(
                   value: newsCubit,
-                  child: Placeholder(),
+                  child: HomePage(),
                 ));
       default:
         return MaterialPageRoute(builder: (context) => const NotFoundPage());

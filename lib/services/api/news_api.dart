@@ -8,7 +8,8 @@ extension NewsApi on ApiService {
     final res = await get("api/users?page=1");
     if (res.statusCode != 200) return [];
 
-    final body = jsonDecode(res.body);
-    return body["data"].map((e) => {News.fromJson(e)}).toList();
+    final Map<String, dynamic> body = jsonDecode(res.body);
+    List<News> _news = (body['data'] as List<dynamic>).map((e) => News.fromJson(e)).toList();
+    return _news;
   }
 }
