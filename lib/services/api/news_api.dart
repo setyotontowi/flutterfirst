@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:velmo/models/news.dart';
 import 'package:velmo/services/api_services.dart';
 
+// this class belong to ApiService, not standalone class like child class
 extension NewsApi on ApiService {
   Future<List<News>> getNews() async {
     final res = await get("v2/top-headlines?country=us");
