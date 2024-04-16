@@ -11,20 +11,39 @@ class LocalService {
   static const String _favoritesKey = "FAVORITES";
 
   static Future<void> addFavorites(News news) async {
+    List<String> newsList = [];
+    bool exist = false;
+
     if (kIsWeb) {
-      final List<String> newsList = [];
       final String? jsonString = html.window.localStorage[_favoritesKey];
       if (jsonString != null) {
-        final List<dynamic> decode = jsonDecode(jsonString);
-        newsList.addAll(decode.map((e) => e.toString()).toList());
+        newsList = jsonToListObject(jsonString);
+
+        for (var element in newsList) {
+          if (element.contains('${news.url}')) exist = true;
+        }
       }
-      newsList.add(jsonEncode(news.toJson()));
-      html.window.localStorage[_favoritesKey] = jsonEncode(newsList);
+
+      if (exist) {
+        deleteNews(news);
+      } else {
+        newsList.add(jsonEncode(news.toJson()));
+        html.window.localStorage[_favoritesKey] = jsonEncode(newsList);
+      }
     } else if (Platform.isAndroid || Platform.isIOS) {
       final SharedPreferences pref = await SharedPreferences.getInstance();
-      final List<String> newsList = pref.getStringList(_favoritesKey) ?? [];
-      newsList.add(jsonEncode(news.toJson()));
-      await pref.setStringList(_favoritesKey, newsList);
+      newsList = pref.getStringList(_favoritesKey) ?? [];
+
+      for (var element in newsList) {
+        if (element.contains('${news.url}')) exist = true;
+      }
+
+      if (exist) {
+        deleteNews(news);
+      } else {
+        newsList.add(jsonEncode(news.toJson()));
+        await pref.setStringList(_favoritesKey, newsList);
+      }
     } else {
       throw PlatformException(code: "ERR01", message: "Platform Not Supported");
     }
@@ -51,17 +70,18 @@ class LocalService {
 
   static Future<void> deleteNews(News news) async {
     if (kIsWeb) {
-      final List<String> newsList = [];
+      List<News> newsList = [];
       final String? jsonString = html.window.localStorage[_favoritesKey];
       if (jsonString != null) {
-        final updatedNewsList = newsList.where((encodedNews) {
-          final decodedNews = News.fromJson(jsonDecode(encodedNews));
-          return decodedNews.url != news.url;
+        newsList = jsonToListNews(jsonToListObject(jsonString));
+
+        final updatedNewsList = newsList.where((storageNews) {
+          return storageNews.url != news.url;
         }).toList();
-        html.window.localStorage[_favoritesKey] = jsonEncode(updatedNewsList);
+
+        final jsonFinal = updatedNewsList.map((n) => n.toJson()).toList();
+        html.window.localStorage[_favoritesKey] = jsonEncode(jsonFinal);
       }
-      newsList.add(jsonEncode(news.toJson()));
-      html.window.localStorage[_favoritesKey] = jsonEncode(newsList);
     } else if (Platform.isAndroid || Platform.isIOS) {
       final SharedPreferences pref = await SharedPreferences.getInstance();
       final List<String> newsList = pref.getStringList(_favoritesKey) ?? [];
@@ -75,5 +95,16 @@ class LocalService {
     } else {
       throw PlatformException(code: "ERR01", message: "Platform Not Supported");
     }
+  }
+
+  static List<String> jsonToListObject(String json) {
+    List<dynamic> decode = jsonDecode(json);
+    List<String> jsonList = decode.map((str) => str.toString()).toList();
+    return jsonList;
+  }
+
+  static List<News> jsonToListNews(List<String> jsonList) {
+    List<News> list = jsonList.map((item) => News.fromJson(jsonDecode(item))).toList();
+    return list;
   }
 }

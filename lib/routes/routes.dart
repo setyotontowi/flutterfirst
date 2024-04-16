@@ -5,7 +5,6 @@ import 'package:velmo/bloc/news_cubit.dart';
 import 'package:velmo/page/404.dart';
 import 'package:velmo/page/favorites_page.dart';
 import 'package:velmo/page/home_page.dart';
-import 'package:velmo/page/news_page.dart';
 
 class MyRoutes {
   final NewsCubit newsCubit = NewsCubit();
