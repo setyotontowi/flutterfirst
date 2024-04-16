@@ -1,18 +1,15 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:velmo/bloc/news_cubit.dart';
+import 'package:velmo/bloc/favorites_cubit.dart';
 import 'package:velmo/models/news.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
-
+class FavoritesPage extends StatelessWidget {
+  FavoritesPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NewsCubit, List<News>>(
+    return BlocBuilder<FavoritesCubit, List<News>>(
         bloc: context.read(),
         builder: (context, state) {
           return Scaffold(
