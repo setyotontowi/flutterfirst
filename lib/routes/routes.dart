@@ -5,6 +5,7 @@ import 'package:velmo/bloc/news_cubit.dart';
 import 'package:velmo/page/404.dart';
 import 'package:velmo/page/favorites_page.dart';
 import 'package:velmo/page/home_page.dart';
+import 'package:velmo/page/news_page.dart';
 
 class MyRoutes {
   final NewsCubit newsCubit = NewsCubit();
@@ -14,8 +15,11 @@ class MyRoutes {
     switch (settings.name) {
       case "/":
         return MaterialPageRoute(
-            builder: (context) => BlocProvider.value(
-                  value: newsCubit,
+            builder: (context) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider.value(value: newsCubit),
+                    BlocProvider.value(value: favoritesCubit)
+                  ],
                   child: HomePage(),
                 ));
       case "/favorites":

@@ -1,18 +1,24 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:velmo/bloc/favorites_cubit.dart';
+import 'package:velmo/bloc/news_cubit.dart';
 import 'package:velmo/models/news.dart';
 
-class FavoritesPage extends StatelessWidget {
-  FavoritesPage({super.key});
+class NewsPage extends StatelessWidget {
+  NewsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FavoritesCubit, List<News>>(
-        bloc: context.read(),
+    NewsCubit cubit = context.read();
+    FavoritesCubit favsCubit = context.read();
+
+    return BlocBuilder<NewsCubit, List<News>>(
+        bloc: cubit,
         builder: (context, state) {
-          if (state.isEmpty) return Center(child: Text("Empty favorites"));
           return Scaffold(
             body: ListView.builder(
                 padding: EdgeInsets.all(20),
@@ -57,7 +63,11 @@ class FavoritesPage extends StatelessWidget {
                                             style: TextStyle(fontSize: 16.0),
                                           ),
                                         ),
-                                        IconButton(onPressed: () {}, icon: Icon(Icons.favorite))
+                                        IconButton(
+                                            onPressed: () {
+                                              favsCubit.saveFavorites(state[index]);
+                                            },
+                                            icon: Icon(Icons.favorite))
                                       ],
                                     ),
                                   ),

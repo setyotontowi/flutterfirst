@@ -13,4 +13,9 @@ class FavoritesCubit extends Cubit<List<News>> {
     favorites = await LocalService.getFavorites();
     emit(favorites);
   }
+
+  Future<void> saveFavorites(News news) async {
+    await LocalService.addFavorites(news);
+    getFavorites();
+  }
 }

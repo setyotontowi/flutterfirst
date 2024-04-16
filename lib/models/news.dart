@@ -30,6 +30,17 @@ class News {
       source: source,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'author': author,
+      'title': title,
+      'description': description,
+      'urlToImage': urlToImage,
+      'url': url,
+      'source': source.toJson()
+    };
+  }
 }
 
 class Source {
@@ -46,5 +57,12 @@ class Source {
       id: map['id'],
       name: map['name'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }

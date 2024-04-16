@@ -15,14 +15,15 @@ class LocalService {
       final List<String> newsList = [];
       final String? jsonString = html.window.localStorage[_favoritesKey];
       if (jsonString != null) {
-        newsList.addAll(jsonDecode(jsonString));
+        final List<dynamic> decode = jsonDecode(jsonString);
+        newsList.addAll(decode.map((e) => e.toString()).toList());
       }
-      newsList.add(jsonEncode(news));
+      newsList.add(jsonEncode(news.toJson()));
       html.window.localStorage[_favoritesKey] = jsonEncode(newsList);
     } else if (Platform.isAndroid || Platform.isIOS) {
       final SharedPreferences pref = await SharedPreferences.getInstance();
       final List<String> newsList = pref.getStringList(_favoritesKey) ?? [];
-      newsList.add(jsonEncode(news));
+      newsList.add(jsonEncode(news.toJson()));
       await pref.setStringList(_favoritesKey, newsList);
     } else {
       throw PlatformException(code: "ERR01", message: "Platform Not Supported");
@@ -34,7 +35,8 @@ class LocalService {
       final List<String> newsList = [];
       final String? jsonString = html.window.localStorage[_favoritesKey];
       if (jsonString != null) {
-        newsList.addAll(jsonDecode(jsonString));
+        final List<dynamic> decode = jsonDecode(jsonString);
+        newsList.addAll(decode.map((e) => e.toString()).toList());
         return newsList.map((encodedNews) => News.fromJson(jsonDecode(encodedNews))).toList();
       }
       return [];
@@ -58,7 +60,7 @@ class LocalService {
         }).toList();
         html.window.localStorage[_favoritesKey] = jsonEncode(updatedNewsList);
       }
-      newsList.add(jsonEncode(news));
+      newsList.add(jsonEncode(news.toJson()));
       html.window.localStorage[_favoritesKey] = jsonEncode(newsList);
     } else if (Platform.isAndroid || Platform.isIOS) {
       final SharedPreferences pref = await SharedPreferences.getInstance();
