@@ -51,24 +51,29 @@ class NewsPage extends StatelessWidget {
                                       },
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            state[index].title ?? "",
-                                            style: TextStyle(fontSize: 16.0),
+                                  AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 300),
+                                    transitionBuilder: (child, animation) {
+                                      return ScaleTransition(
+                                        scale: animation,
+                                        child: child,
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              state[index].title ?? "",
+                                              style: TextStyle(fontSize: 16.0),
+                                            ),
                                           ),
-                                        ),
-                                        IconButton(
-                                            onPressed: () {
-                                              favsCubit.saveFavorites(state[index]);
-                                            },
-                                            icon: Icon(Icons.favorite))
-                                      ],
+                                          ToggleFavorites(favsCubit: favsCubit, news: state[index])
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   SizedBox(
@@ -104,5 +109,39 @@ class NewsPage extends StatelessWidget {
       // Catch any exceptions that occur during image loading
       throw error;
     }
+  }
+}
+
+class ToggleFavorites extends StatefulWidget {
+  const ToggleFavorites({
+    super.key,
+    required this.favsCubit,
+    required this.news,
+  });
+
+  final FavoritesCubit favsCubit;
+  final News news;
+
+  @override
+  State<ToggleFavorites> createState() => _ToggleFavoritesState();
+}
+
+class _ToggleFavoritesState extends State<ToggleFavorites> {
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 300),
+      child: IconButton(
+        key: ValueKey<bool>(widget.favsCubit.isFavorites(widget.news.url ?? "")),
+        onPressed: () {
+          setState(() {
+            widget.favsCubit.saveFavorites(widget.news);
+          });
+        },
+        icon: Icon(widget.favsCubit.isFavorites(widget.news.url ?? "")
+            ? Icons.favorite
+            : Icons.favorite_border),
+      ),
+    );
   }
 }

@@ -8,14 +8,24 @@ class FavoritesCubit extends Cubit<List<News>> {
   }
 
   List<News> favorites = [];
+  Set<String> favoritesSet = {};
 
   Future<void> getFavorites() async {
     favorites = await LocalService.getFavorites();
+    favoritesSet = favorites
+        .map(
+          (e) => e.url ?? "",
+        )
+        .toSet();
     emit(favorites);
   }
 
   Future<void> saveFavorites(News news) async {
     await LocalService.addFavorites(news);
     getFavorites();
+  }
+
+  bool isFavorites(String url) {
+    return favoritesSet.contains(url);
   }
 }
