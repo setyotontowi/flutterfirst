@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:velmo/bloc/favorites_cubit.dart';
 import 'package:velmo/bloc/news_cubit.dart';
 import 'package:velmo/models/news.dart';
@@ -28,10 +29,13 @@ class NewsPage extends StatelessWidget {
                   return FutureBuilder(
                       future: _loadImage(urlImage),
                       builder: (context, snapshot) {
+                        final format = DateFormat('EEEE dd MMMM, HH:mm');
                         if (snapshot.stackTrace != null) {
                           return SizedBox.shrink();
                         } else {
                           return Card(
+                            color: Colors.white,
+                            surfaceTintColor: Colors.white,
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             elevation: 4,
                             shape:
@@ -45,11 +49,15 @@ class NewsPage extends StatelessWidget {
                                       urlImage,
                                       fit: BoxFit.cover,
                                       width: double.infinity,
-                                      height: 200,
+                                      height: 300,
                                       errorBuilder: (context, exception, stack) {
                                         return SizedBox.shrink();
                                       },
                                     ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Text(state[index].title ?? "",style: TextStyle(fontSize: 16.0),),
                                   ),
                                   AnimatedSwitcher(
                                     duration: Duration(milliseconds: 300),
@@ -60,15 +68,15 @@ class NewsPage extends StatelessWidget {
                                       );
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
+                                      padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Flexible(
                                             child: Text(
-                                              state[index].title ?? "",
-                                              style: TextStyle(fontSize: 16.0),
+                                              format.format(state[index].publishedAt ?? DateTime.now()),
+                                              style: TextStyle(fontSize: 12.0),
                                             ),
                                           ),
                                           ToggleFavorites(favsCubit: favsCubit, news: state[index])
@@ -139,8 +147,8 @@ class _ToggleFavoritesState extends State<ToggleFavorites> {
           });
         },
         icon: Icon(widget.favsCubit.isFavorites(widget.news.url ?? "")
-            ? Icons.favorite
-            : Icons.favorite_border),
+            ? Icons.bookmark
+            : Icons.bookmark_border),
       ),
     );
   }

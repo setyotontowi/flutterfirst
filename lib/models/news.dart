@@ -1,9 +1,12 @@
+import 'package:intl/intl.dart';
+
 class News {
   final String? author;
   final String? title;
   final String? description;
   final String? urlToImage;
   final String? url;
+  final DateTime? publishedAt;
   final Source source;
 
   const News({
@@ -12,6 +15,7 @@ class News {
     this.description = "",
     this.urlToImage = "",
     this.url = "",
+    this.publishedAt,
     this.source = const Source(),
   });
 
@@ -21,23 +25,30 @@ class News {
       source = Source.fromJson(map['source']);
     }
 
+    final publishedAtString = map["publishedAt"];
+    final publishedAt = DateTime.parse(publishedAtString);
+
     return News(
       author: map["author"],
       title: map["title"],
       description: map["description"],
       urlToImage: map["urlToImage"],
       url: map["url"],
+      publishedAt: publishedAt,
       source: source,
     );
   }
 
   Map<String, dynamic> toJson() {
+    final format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+
     return {
       'author': author,
       'title': title,
       'description': description,
       'urlToImage': urlToImage,
       'url': url,
+      'publishedAt': format.format(publishedAt ?? DateTime.now()),
       'source': source.toJson()
     };
   }
