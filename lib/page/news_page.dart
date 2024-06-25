@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,94 +8,110 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:velmo/bloc/favorites_cubit.dart';
 import 'package:velmo/bloc/news_cubit.dart';
+import 'package:velmo/bloc/state/news_state.dart';
 import 'package:velmo/models/news.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
-class NewsPage extends StatelessWidget {
+class NewsPage extends StatefulWidget {
   NewsPage({super.key});
 
+  @override
+  State<NewsPage> createState() => _NewsPageState();
+}
+
+class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     NewsCubit cubit = context.read();
     FavoritesCubit favsCubit = context.read();
 
-    return BlocBuilder<NewsCubit, List<News>>(
+    return BlocBuilder<NewsCubit, NewsState>(
         bloc: cubit,
         builder: (context, state) {
-          return Scaffold(
+          if (state is NewsLoaded) {
+            return Scaffold(
             body: ListView.builder(
                 padding: EdgeInsets.all(20),
-                itemCount: state.length,
+                itemCount: state.news.length,
                 itemBuilder: (context, index) {
-                  String urlImage = state[index].urlToImage ?? "";
+                  String urlImage = state.news[index].urlToImage ?? "";
                   return FutureBuilder(
                       future: _loadImage(urlImage),
                       builder: (context, snapshot) {
                         final format = DateFormat('EEEE dd MMMM, HH:mm');
-                        if (snapshot.stackTrace != null) {
-                          return SizedBox.shrink();
-                        } else {
-                          return Card(
-                            color: Colors.white,
-                            surfaceTintColor: Colors.white,
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            elevation: 4,
-                            shape:
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ClipRRect(
-                                    child: Image.network(
-                                      urlImage,
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: 300,
-                                      errorBuilder: (context, exception, stack) {
-                                        return SizedBox.shrink();
-                                      },
+                        return VisibilityDetector(
+                            key: Key(index.toString()),
+                            onVisibilityChanged: (VisibilityInfo info) {
+                              if (info.visibleFraction == 1) {
+                                setState(() {
+                                  print("index $index");
+                                });
+                              }
+                            },
+                            child: Card(
+                              color: Colors.white,
+                              surfaceTintColor: Colors.white,
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              elevation: 4,
+                              shape:
+                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    snapshot.stackTrace == null? 
+                                    ClipRRect(
+                                      child: CachedNetworkImage(
+                                        imageUrl: urlImage,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: 300,
+                                      ),
+                                    ) : Container(),
+                                    Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Text(state.news[index].title ?? "",style: TextStyle(fontSize: 16.0),),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Text(state[index].title ?? "",style: TextStyle(fontSize: 16.0),),
-                                  ),
-                                  AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 300),
-                                    transitionBuilder: (child, animation) {
-                                      return ScaleTransition(
-                                        scale: animation,
-                                        child: child,
-                                      );
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              format.format(state[index].publishedAt ?? DateTime.now()),
-                                              style: TextStyle(fontSize: 12.0),
+                                    AnimatedSwitcher(
+                                      duration: Duration(milliseconds: 300),
+                                      transitionBuilder: (child, animation) {
+                                        return ScaleTransition(
+                                          scale: animation,
+                                          child: child,
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                format.format(state.news[index].publishedAt ?? DateTime.now()),
+                                                style: TextStyle(fontSize: 12.0),
+                                              ),
                                             ),
-                                          ),
-                                          ToggleFavorites(favsCubit: favsCubit, news: state[index])
-                                        ],
+                                            ToggleFavorites(favsCubit: favsCubit, news: state.news[index])
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 20.0,
-                                  )
-                                ],
+                                    SizedBox(
+                                      height: 20.0,
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           );
-                        }
                       });
                 }),
           );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+          
         });
   }
 
@@ -115,7 +132,8 @@ class NewsPage extends StatelessWidget {
       await completer.future;
     } catch (error) {
       // Catch any exceptions that occur during image loading
-      throw error;
+      rethrow;
+
     }
   }
 }
